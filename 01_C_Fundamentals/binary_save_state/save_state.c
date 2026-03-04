@@ -18,20 +18,44 @@ but it's incredibly fast to load/save because no "parsing" of text is required.
  */
 #include <stdio.h>
 #include <string.h>
-#define BUFFER 100
 
 typedef struct player{
     char name[50];
     unsigned int level;
     float health;
-    float experience;
 } Player;
 
-int main(){
-    Player player;
-    FILE* fileptr=("initial_file.txt","r");
-    fwrite(&player,sizeof(player),1,fileptr);
 
-    close(fileptr);
+void createPlayer(Player* p){
+    printf("Player name: ");
+    fgets(p->name,sizeof(p->name),stdin);
+    p->name[strcspn(p->name,"\n")]=0;
+    printf("Player level: ");
+    scanf("%u",&p->level);
+    printf("Player health: ");
+    scanf("%f",&p->health);
+}
+
+void createSave(Player* player,char filename[10]){
+    FILE* file=fopen(filename,"wb");
+    if (file!=NULL){
+        fwrite(player,sizeof(Player),1,file);
+        fclose(file);
+    } 
+}
+
+void loadSave(Player* player, char filename[10]){
+    FILE* fileptr=fopen(filename,"rb");
+    if (fileptr!=NULL){
+        fread(player,sizeof(Player),1,fileptr);
+        fclose(fileptr);
+    }
+}
+
+int main(){
+    Player p1;
+    createPlayer(&p1);
+    createSave(&p1,"player1.bin");
+    loadSave(&p1,"player1.bin");
     return 0;
 }
